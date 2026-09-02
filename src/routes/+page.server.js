@@ -9,7 +9,7 @@ export async function load() {
         .orderBy(desc(vacancy.createdAt))
         .all();
 
-        
+
     return {
         vacancies
     };
