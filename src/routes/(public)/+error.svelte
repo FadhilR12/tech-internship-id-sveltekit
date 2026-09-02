@@ -1,6 +1,5 @@
 <script>
-	let { error, status } = $props();
-    import {
+	import {
 		LayoutList,
         MapPinOff,
         Home,

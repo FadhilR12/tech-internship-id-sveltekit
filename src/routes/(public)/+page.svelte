@@ -254,7 +254,7 @@
 					<a
 						href="/vacancy/{vacancy.id}"
 						data-vacancy-card
-						data-created-at={formatDate(vacancy.createdAt)}
+						data-created-at={formatDate(vacancy.createdAt, 'yyyy-MM-dd')}
 						data-work-type={vacancy.workType}
 						data-search="frontend engineer intern arunika commerce jakarta selatan hybrid html css javascript responsive design rest api"
 						class="vacancy-card focus-ring group block rounded-2xl border border-slate-200 bg-white p-5 text-inherit no-underline sm:p-6"

@@ -1,12 +1,6 @@
-<script>
-	import './layout.css';
-	const { children } = $props();
+﻿<script>
+	import '../app.css';
+	let { children } = $props();
 </script>
 
-<div class="flex min-h-screen flex-col">
-	{@render children()}
-
-	<footer class="border-t border-slate-200 bg-white px-5 py-7 text-center text-sm text-slate-500">
-		TechInternship.ID · Internship tech Indonesia
-	</footer>
-</div>
+{@render children()}

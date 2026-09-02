@@ -33,9 +33,6 @@ export function passedDays(timestamp) {
 }
 
 export function formatDate(dateString) {
-    return new Date(dateString).toLocaleDateString('id-ID', {
-        day: 'numeric',
-        month: 'numeric',
-        year: 'numeric'
-    });
+    const date = new Date(dateString * 1000);
+    return date.toISOString().split('T')[0];
 }
