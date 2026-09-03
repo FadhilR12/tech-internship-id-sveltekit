@@ -20,7 +20,7 @@ To recreate this project with the same configuration:
 
 ```sh
 # recreate this project
-npx sv@0.17.0 create --template library --no-types --add prettier tailwindcss="plugins:typography,forms" drizzle="database:sqlite+sqlite:better-sqlite3" --install npm .
+npx sv@0.17.0 create --template library --no-types --add prettier tailwindcss="plugins:typography,forms" --install npm .
 ```
 
 ## Developing

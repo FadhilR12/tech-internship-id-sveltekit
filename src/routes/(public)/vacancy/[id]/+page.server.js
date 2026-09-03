@@ -1,16 +1,11 @@
 import { error } from '@sveltejs/kit';
-import { vacancies } from '$lib/server/db';
+import data from '$lib/data/data.json';
 
 export function load({ params }) {
-	const result = vacancies.find(
-		(v) => v.id === Number(params.id) && v.isDeleted === false
-	);
+    const vacancy = data.vacancy.find((item) => String(item.id) === String(params.id) && item.visibleStatus === 'Shown' && !item.isDeleted);
+    if (!vacancy) error(404);
 
-	if (!result) {
-		error(404, 'Vacancy tidak ditemukan');
-	}
-
-	return {
-		vacancy: result
-	};
+    return {
+        vacancy
+    };
 }
