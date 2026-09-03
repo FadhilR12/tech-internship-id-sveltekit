@@ -1,20 +1,16 @@
 import { error } from '@sveltejs/kit';
-import { db } from '$lib/server/db';
-import { vacancy } from '$lib/server/db/schema';
-import { eq, and } from 'drizzle-orm';
+import { vacancies } from '$lib/server/db';
 
 export function load({ params }) {
-    const result = db
-        .select()
-        .from(vacancy)
-        .where(and(eq(vacancy.id, Number(params.id)), eq(vacancy.isDeleted, 0)))
-        .get();
+	const result = vacancies.find(
+		(v) => v.id === Number(params.id) && v.isDeleted === false
+	);
 
-    if (!result) {
-        error(404, 'Vacancy tidak ditemukan');
-    }
+	if (!result) {
+		error(404, 'Vacancy tidak ditemukan');
+	}
 
-    return {
-        vacancy: result
-    };
+	return {
+		vacancy: result
+	};
 }

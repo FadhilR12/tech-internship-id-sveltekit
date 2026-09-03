@@ -1,6 +1,4 @@
-import { db } from '$lib/server/db';
-import { vacancy, view } from '$lib/server/db/schema';
-import { and, eq, gte, sql } from 'drizzle-orm';
+import { vacancies, views } from '$lib/server/db';
 
 function formatDate(date) {
 	return date.toISOString().split('T')[0];
@@ -8,52 +6,40 @@ function formatDate(date) {
 
 export function load() {
 	const today = new Date();
-
 	const todayDate = formatDate(today);
 
 	const sevenDaysAgo = new Date(today);
 	sevenDaysAgo.setDate(today.getDate() - 6);
-
 	const sevenDaysAgoDate = formatDate(sevenDaysAgo);
 
-	const vacancies = db
-		.select({
-			id: vacancy.id,
-			title: vacancy.title,
-			company: vacancy.company,
-			companyInitial: vacancy.companyInitial,
-			visibleStatus: vacancy.visibleStatus,
+	const activeVacancies = vacancies.filter((v) => v.isDeleted === false);
 
-			todayViews: sql`
-				COALESCE(
-					SUM(
-						CASE
-							WHEN ${view.createdAt} = ${todayDate}
-							THEN ${view.count}
-							ELSE 0
-						END
-					),
-					0
-				)
-			`.mapWith(Number),
+	const result = activeVacancies.map((v) => {
+		const vacViews = views.filter(
+			(vw) => vw.vacId === v.id && vw.createdAt >= sevenDaysAgoDate
+		);
 
-			sevenDaysViews: sql`
-				COALESCE(
-					SUM(${view.count}),
-					0
-				)
-			`.mapWith(Number)
-		})
-		.from(vacancy)
-		.leftJoin(view, and(eq(vacancy.id, view.vacId), gte(view.createdAt, sevenDaysAgoDate)))
-		.where(eq(vacancy.isDeleted, false))
-		.groupBy(vacancy.id)
-		.all();
+		const todayViews = vacViews
+			.filter((vw) => vw.createdAt === todayDate)
+			.reduce((sum, vw) => sum + vw.count, 0);
 
-	const totalTodayViews = vacancies.reduce((acc, curr) => acc + curr.todayViews, 0);
-	const totalSevenDaysViews = vacancies.reduce((acc, curr) => acc + curr.sevenDaysViews, 0);
+		const sevenDaysViews = vacViews.reduce((sum, vw) => sum + vw.count, 0);
 
-	const topVacancies = vacancies
+		return {
+			id: v.id,
+			title: v.title,
+			company: v.company,
+			companyInitial: v.companyInitial,
+			visibleStatus: v.visibleStatus,
+			todayViews,
+			sevenDaysViews
+		};
+	});
+
+	const totalTodayViews = result.reduce((acc, curr) => acc + curr.todayViews, 0);
+	const totalSevenDaysViews = result.reduce((acc, curr) => acc + curr.sevenDaysViews, 0);
+
+	const topVacancies = result
 		.filter((v) => v.sevenDaysViews > 0)
 		.sort((a, b) => b.sevenDaysViews - a.sevenDaysViews)
 		.slice(0, 7);
