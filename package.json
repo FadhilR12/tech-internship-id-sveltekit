@@ -1,5 +1,5 @@
 {
-	"name": "tech-internship-id",
+	"name": "tech-internship-id-2",
 	"version": "0.0.1",
 	"scripts": {
 		"dev": "vite dev",
@@ -8,11 +8,7 @@
 		"prepare": "svelte-kit sync || echo ''",
 		"prepack": "svelte-kit sync && svelte-package && publint",
 		"lint": "prettier --check .",
-		"format": "prettier --write .",
-		"db:push": "drizzle-kit push",
-		"db:generate": "drizzle-kit generate",
-		"db:migrate": "drizzle-kit migrate",
-		"db:studio": "drizzle-kit studio"
+		"format": "prettier --write ."
 	},
 	"files": [
 		"dist",
@@ -42,11 +38,6 @@
 		"@tailwindcss/forms": "^0.5.11",
 		"@tailwindcss/typography": "^0.5.19",
 		"@tailwindcss/vite": "^4.3.0",
-		"@types/better-sqlite3": "^7.6.13",
-		"@types/node": "^24",
-		"drizzle-kit": "^0.31.10",
-		"drizzle-orm": "^0.45.2",
-		"prettier": "^3.8.3",
 		"prettier-plugin-svelte": "^4.1.0",
 		"prettier-plugin-tailwindcss": "^0.8.0",
 		"publint": "^0.3.21",
@@ -60,6 +51,6 @@
 	],
 	"dependencies": {
 		"@lucide/svelte": "^1.39.0",
-		"better-sqlite3": "^13.0.2"
+		"prettier": "^3.9.6"
 	}
 }

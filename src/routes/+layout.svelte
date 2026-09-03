@@ -1,6 +1,8 @@
-﻿<script>
+<script>
 	import '../app.css';
 	let { children } = $props();
 </script>
 
-{@render children()}
+<div class="flex min-h-screen flex-col bg-slate-50 text-slate-900">
+	{@render children()}
+</div>

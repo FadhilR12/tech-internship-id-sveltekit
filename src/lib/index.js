@@ -1,6 +1,4 @@
 // Reexport your entry components here
-// src/lib/index.js
-
 export function plainText(html) {
     if (!html) return '';
 
@@ -8,7 +6,7 @@ export function plainText(html) {
         .replace(/<[^>]*>/g, ' ')
         .replace(/\s+/g, ' ')
         .trim();
-}    
+}
 
 export function excerpt(text, max = 140) {
     if (!text) return '';
@@ -35,4 +33,25 @@ export function passedDays(timestamp) {
 export function formatDate(dateString) {
     const date = new Date(dateString * 1000);
     return date.toISOString().split('T')[0];
+}
+
+export function processVacancies(vacancies, searchQuery, sortBy, workTypeFilter) {
+    let filteredVacancies = vacancies.filter(vacancy => {
+        const match = vacancy.title.toLowerCase().includes(searchQuery.toLowerCase()) || vacancy.company.toLowerCase().includes(searchQuery.toLowerCase()) || vacancy.location.toLowerCase().includes(searchQuery.toLowerCase());
+
+        const workTypeMatch = workTypeFilter === '' || vacancy.workType === workTypeFilter;
+
+        return match && workTypeMatch;
+    });
+
+    filteredVacancies.sort((a, b) => {
+        const dateA = Number(a.createdAt);
+        const dateB = Number(b.createdAt);
+
+        if (sortBy === 'newest') return dateB - dateA;
+        if (sortBy === 'oldest') return dateA - dateB;
+        return 0;
+    });
+
+    return filteredVacancies;
 }

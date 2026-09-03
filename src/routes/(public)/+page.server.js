@@ -1,13 +1,14 @@
-import { db } from '$lib/server/db';
-import { vacancy } from '$lib/server/db/schema';
-import { eq, desc, and } from 'drizzle-orm';
+import data from '$lib/data/data.json';
 
-export async function load() {
-    const vacancies = db.select()
-        .from(vacancy)
-        .where(and(eq(vacancy.visibleStatus, 'Shown'), eq(vacancy.isDeleted, 0)))
-        .orderBy(desc(vacancy.createdAt))
-        .all();
+export function load() {
+    const vacancies = data.vacancy.filter((vacancy) => vacancy.visibleStatus === 'Shown' && !vacancy.isDeleted).map((vacancy) => {
+        const totalView = data.totalView.find((view) => view.vacId === vacancy.id);
+        return {
+            ...vacancy,
+            viewCount: totalView?.count ?? 0
+        };
+    });
+    
     return {
         vacancies
     };
