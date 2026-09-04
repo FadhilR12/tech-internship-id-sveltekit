@@ -1,57 +1,60 @@
 // Reexport your entry components here
 export function plainText(html) {
-    if (!html) return '';
+	if (!html) return '';
 
-    return html
-        .replace(/<[^>]*>/g, ' ')
-        .replace(/\s+/g, ' ')
-        .trim();
+	return html
+		.replace(/<[^>]*>/g, ' ')
+		.replace(/\s+/g, ' ')
+		.trim();
 }
 
 export function excerpt(text, max = 140) {
-    if (!text) return '';
+	if (!text) return '';
 
-    if (text.length <= max) {
-        return text;
-    }
+	if (text.length <= max) {
+		return text;
+	}
 
-    return text.slice(0, max) + '...';
+	return text.slice(0, max) + '...';
 }
 
 export function passedDays(timestamp) {
-    const pastTime = new Date(timestamp * 1000);
-    const now = new Date();
-    const daysPassed = Math.floor((now - pastTime) / (1000 * 60 * 60 * 24));
+	const pastTime = new Date(timestamp * 1000);
+	const now = new Date();
+	const daysPassed = Math.floor((now - pastTime) / (1000 * 60 * 60 * 24));
 
-    if (daysPassed === 0) {
-        return 'Hari ini';
-    }
+	if (daysPassed === 0) {
+		return 'Hari ini';
+	}
 
-    return `${daysPassed} hari lalu`;
+	return `${daysPassed} hari lalu`;
 }
 
 export function formatDate(dateString) {
-    const date = new Date(dateString * 1000);
-    return date.toISOString().split('T')[0];
+	const date = new Date(dateString * 1000);
+	return date.toISOString().split('T')[0];
 }
 
 export function processVacancies(vacancies, searchQuery, sortBy, workTypeFilter) {
-    let filteredVacancies = vacancies.filter(vacancy => {
-        const match = vacancy.title.toLowerCase().includes(searchQuery.toLowerCase()) || vacancy.company.toLowerCase().includes(searchQuery.toLowerCase()) || vacancy.location.toLowerCase().includes(searchQuery.toLowerCase());
+	let filteredVacancies = vacancies.filter((vacancy) => {
+		const match =
+			vacancy.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+			vacancy.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
+			vacancy.location.toLowerCase().includes(searchQuery.toLowerCase());
 
-        const workTypeMatch = workTypeFilter === '' || vacancy.workType === workTypeFilter;
+		const workTypeMatch = workTypeFilter === '' || vacancy.workType === workTypeFilter;
 
-        return match && workTypeMatch;
-    });
+		return match && workTypeMatch;
+	});
 
-    filteredVacancies.sort((a, b) => {
-        const dateA = Number(a.createdAt);
-        const dateB = Number(b.createdAt);
+	filteredVacancies.sort((a, b) => {
+		const dateA = Number(a.createdAt);
+		const dateB = Number(b.createdAt);
 
-        if (sortBy === 'newest') return dateB - dateA;
-        if (sortBy === 'oldest') return dateA - dateB;
-        return 0;
-    });
+		if (sortBy === 'newest') return dateB - dateA;
+		if (sortBy === 'oldest') return dateA - dateB;
+		return 0;
+	});
 
-    return filteredVacancies;
+	return filteredVacancies;
 }

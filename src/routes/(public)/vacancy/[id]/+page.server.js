@@ -6,6 +6,7 @@ export function load({ params }) {
     if (!vacancy) error(404);
 
     return {
-        vacancy
+        // escape string untuk descHtml
+        vacancy 
     };
 }

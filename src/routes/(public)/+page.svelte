@@ -16,20 +16,43 @@
 		Building2,
 		GraduationCap,
 		ArrowDown,
-    ArrowUpDown
+		ArrowUpDown
 	} from '@lucide/svelte';
-	import { plainText, excerpt, passedDays } from '$lib';
-	import { processVacancies } from '$lib/index.js';
+	import { plainText, excerpt, passedDays, processVacancies } from '$lib';
 	let { data } = $props();
 	const { vacancies } = data;
 
+	// TODO: searchQuery tambah debounce/blur -> baru melempar request saat tidak ada aktivitas selama beberapa detik
 	let searchQuery = $state('');
 	let workTypeFilter = $state('');
 	let sortBy = $state('newest');
 
+	function debounce(val, delay = 300) {
+		let s = $state(val);
+		let timeout;
+
+		return {
+			get value() {
+				return s;
+			},
+			set value(newValue) {
+				clearTimeout(timeout);
+				timeout = setTimeout(() => {
+					s = newValue;
+				}, delay);
+			}
+		};
+	}
+
+	let debouncedSearch = debounce('', 500);
+	$effect(() => {
+		debouncedSearch.value = searchQuery;
+	});
+
 	let filteredVacancies = $derived(
-		processVacancies(vacancies, searchQuery, sortBy, workTypeFilter)
+		processVacancies(vacancies, debouncedSearch.value, sortBy, workTypeFilter)
 	);
+
 	function resetFilter() {
 		searchQuery = '';
 		workTypeFilter = '';
