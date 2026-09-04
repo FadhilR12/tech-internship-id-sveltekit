@@ -1,4 +1,5 @@
 <script>
+	import { onMount } from 'svelte';
 	import {
 		Laptop,
 		MapPin,
@@ -12,8 +13,13 @@
 		GraduationCap,
 		LayoutList
 	} from '@lucide/svelte';
-	import { passedDays } from '$lib';
-  let { data } = $props();
+	import { passedDays, sanitizeHtml } from '$lib';
+	let { data } = $props();
+	let safeDescription = $state('');
+
+	onMount(async () => {
+		safeDescription = await sanitizeHtml(data.vacancy.descHtml);
+	});
 </script>
 
 <header class="border-b border-slate-200 bg-white">
@@ -59,8 +65,8 @@
 					class="mt-6 flex flex-wrap gap-4 border-t border-slate-100 pt-5 text-sm font-semibold text-slate-500"
 				>
 					<span class="flex items-center gap-2"
-						><MapPin class="h-4 w-4 text-indigo-500" aria-hidden="true"
-						></MapPin>{data.vacancy.location}</span
+						><MapPin class="h-4 w-4 text-indigo-500" aria-hidden="true"></MapPin>{data.vacancy
+							.location}</span
 					><span class="flex items-center gap-2">
 						{#if data.vacancy.workType === 'Remote'}
 							<Wifi class="h-4 w-4 text-indigo-500" aria-hidden="true" />
@@ -72,13 +78,14 @@
 
 						{data.vacancy.workType}
 					</span><span class="flex items-center gap-2"
-						><Clock3 class="h-4 w-4 text-indigo-500" aria-hidden="true"
-						></Clock3>{passedDays(data.vacancy.createdAt)}</span
+						><Clock3 class="h-4 w-4 text-indigo-500" aria-hidden="true"></Clock3>{passedDays(
+							data.vacancy.createdAt
+						)}</span
 					>
 				</div>
 			</section>
 			<section class="rich-content mt-5 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
-				{@html data.vacancy.descHtml}
+				{@html safeDescription}
 			</section>
 			<section
 				class="mt-5 flex flex-col gap-6 rounded-2xl border border-indigo-100 bg-white p-6 shadow-lg shadow-indigo-100/40 sm:flex-row sm:items-center sm:justify-between sm:p-8"
@@ -100,7 +107,7 @@
 					</div>
 				</div>
 				<a
-					href="{data.vacancy.applicationUrl}"
+					href={data.vacancy.applicationUrl}
 					target="_blank"
 					rel="noopener noreferrer"
 					class="focus-ring flex w-full shrink-0 items-center justify-center gap-2 rounded-xl bg-indigo-600 px-6 py-3 text-center text-sm font-bold text-white hover:bg-indigo-700 sm:w-auto"

@@ -1,19 +1,18 @@
 <script>
-    import {
-        GraduationCap,
-        ChartNoAxesColumnIncreasing, 
-        LogOut,
-        ExternalLink,
-        Eye,
-        BriefcaseBusiness,
-        EyeOff,
-        CalendarDays,
-        ListFilter,
-        Inbox
-        } from '@lucide/svelte'
+	import {
+		GraduationCap,
+		ChartNoAxesColumnIncreasing,
+		LogOut,
+		ExternalLink,
+		Eye,
+		BriefcaseBusiness,
+		EyeOff,
+		CalendarDays,
+		ListFilter,
+		Inbox
+	} from '@lucide/svelte';
 
-    let {data} = $props()
-    console.log(data)
+	let { data } = $props();
 </script>
 
 <header class="border-b border-slate-200 bg-white">
@@ -68,7 +67,7 @@
 				<span class="sm:hidden">Hari ini</span><span class="hidden sm:inline">Views hari ini</span>
 			</p>
 			<p id="today-views" class="mt-1 max-w-full text-2xl font-extrabold tabular-nums sm:text-3xl">
-				16
+				{data.overview.todayTotalViews}
 			</p>
 		</div>
 		<div
@@ -85,7 +84,7 @@
 				id="seven-day-views"
 				class="mt-1 max-w-full text-2xl font-extrabold tabular-nums sm:text-3xl"
 			>
-				103
+				{data.overview.sevenDayTotalViews}
 			</p>
 		</div>
 	</div>
@@ -114,33 +113,44 @@
 				<!-- Go template: range ranking vacancy termasuk data arsip. -->
 				<!-- Tautan detail memakai HTML biasa agar list tetap dapat dinavigasi tanpa JavaScript. -->
 				<tbody id="analytics-table">
-					<tr
-						class="focus-visible:outline-inset cursor-pointer border-b border-slate-100 transition last:border-0 hover:bg-slate-50 focus-visible:bg-indigo-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-indigo-500"
-						><td class="px-5 py-4"
-							><a href="/admin/vacancy/[id]" class="row-link" aria-label="Buka detail vacancy"
-								><div class="flex items-center gap-3">
+					{#each data.topVacancies as vacancy}
+						<tr
+							class="focus-visible:outline-inset cursor-pointer border-b border-slate-100 transition last:border-0 hover:bg-slate-50 focus-visible:bg-indigo-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-indigo-500"
+							><td class="px-5 py-4"
+								><a href="/admin/vacancy/[id]" class="row-link" aria-label="Buka detail vacancy"
+									><div class="flex items-center gap-3">
+										<span
+											class="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-indigo-50 text-xs font-extrabold text-indigo-700"
+											>{vacancy.companyInitial}</span
+										>
+										<div>
+											<p class="text-sm font-extrabold">{vacancy.title}</p>
+											<p class="mt-1 text-xs text-slate-400">{vacancy.company}</p>
+										</div>
+									</div></a
+								></td
+							><td class="px-4 py-4">
+								{#if vacancy.visibleStatus === 'Shown'}
 									<span
-										class="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-indigo-50 text-xs font-extrabold text-indigo-700"
-										>AC</span
+										class="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700"
+										><Eye class="h-3 w-3" aria-hidden="true"></Eye>{vacancy.visibleStatus}</span
 									>
-									<div>
-										<p class="text-sm font-extrabold">Frontend Engineer Intern</p>
-										<p class="mt-1 text-xs text-slate-400">Arunika Commerce</p>
-									</div>
-								</div></a
-							></td
-						><td class="px-4 py-4"
-							><span
-								class="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700"
-								><Eye class="h-3 w-3" aria-hidden="true"></Eye>Shown</span
-							></td
-						><td class="px-4 py-4 text-right text-sm font-semibold"
-							><span class="inline-flex items-center justify-end gap-1.5"
-								><Eye class="h-3.5 w-3.5 text-slate-400" aria-hidden="true"
-								></Eye>6</span
-							></td
-						><td class="px-5 py-4 text-right text-sm font-extrabold text-indigo-600">21</td></tr
-					>
+								{:else}
+									<span
+										class="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-bold text-amber-700"
+										><EyeOff class="h-3 w-3" aria-hidden="true"></EyeOff>{vacancy.visibleStatus}</span
+									>
+								{/if}
+							</td><td class="px-4 py-4 text-right text-sm font-semibold"
+								><span class="inline-flex items-center justify-end gap-1.5"
+									><Eye class="h-3.5 w-3.5 text-slate-400" aria-hidden="true"
+									></Eye>{vacancy.todayViews}</span
+								></td
+							><td class="px-5 py-4 text-right text-sm font-extrabold text-indigo-600"
+								>{vacancy.sevenDayViews}</td
+							></tr
+						>
+					{/each}
 				</tbody>
 			</table>
 		</div>

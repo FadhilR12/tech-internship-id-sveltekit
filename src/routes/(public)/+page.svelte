@@ -58,6 +58,7 @@
 		workTypeFilter = '';
 		sortBy = 'newest';
 	}
+
 </script>
 
 <header class="sticky top-0 z-40 border-b border-slate-200/80 bg-white/90 backdrop-blur-xl">

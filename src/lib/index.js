@@ -1,4 +1,7 @@
 // Reexport your entry components here
+import { match } from '$app/paths';
+import DOMPurify from 'dompurify';
+
 export function plainText(html) {
 	if (!html) return '';
 
@@ -37,10 +40,7 @@ export function formatDate(dateString) {
 
 export function processVacancies(vacancies, searchQuery, sortBy, workTypeFilter) {
 	let filteredVacancies = vacancies.filter((vacancy) => {
-		const match =
-			vacancy.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-			vacancy.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
-			vacancy.location.toLowerCase().includes(searchQuery.toLowerCase());
+		const match = matches(vacancy, searchQuery);
 
 		const workTypeMatch = workTypeFilter === '' || vacancy.workType === workTypeFilter;
 
@@ -53,8 +53,23 @@ export function processVacancies(vacancies, searchQuery, sortBy, workTypeFilter)
 
 		if (sortBy === 'newest') return dateB - dateA;
 		if (sortBy === 'oldest') return dateA - dateB;
+
 		return 0;
 	});
 
 	return filteredVacancies;
+}
+
+export async function sanitizeHtml(html) {
+	return DOMPurify.sanitize(html);
+}
+
+export function matches(vacancy, searchQuery) {
+	const query = searchQuery.toLowerCase();
+
+	return (
+		vacancy.title.toLowerCase().includes(query) ||
+		vacancy.company.toLowerCase().includes(query) ||
+		vacancy.location.toLowerCase().includes(query)
+	);
 }
