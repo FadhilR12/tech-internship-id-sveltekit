@@ -117,7 +117,7 @@
 						<tr
 							class="focus-visible:outline-inset cursor-pointer border-b border-slate-100 transition last:border-0 hover:bg-slate-50 focus-visible:bg-indigo-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-indigo-500"
 							><td class="px-5 py-4"
-								><a href="/admin/vacancy/[id]" class="row-link" aria-label="Buka detail vacancy"
+								><a href="/admin/vacancy/{vacancy.id}" class="row-link" aria-label="Buka detail vacancy"
 									><div class="flex items-center gap-3">
 										<span
 											class="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-indigo-50 text-xs font-extrabold text-indigo-700"

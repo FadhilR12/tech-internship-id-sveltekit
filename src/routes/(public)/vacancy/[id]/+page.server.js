@@ -1,8 +1,9 @@
 import { error } from '@sveltejs/kit';
-import data from '$lib/data/data.json';
 
-export function load({ params }) {
-    const vacancy = data.vacancy.find((item) => String(item.id) === String(params.id) && item.visibleStatus === 'Shown' && !item.isDeleted);
+export async function load({ fetch, params }) {
+    const response = await fetch('/api/vacancies');
+    const vacancies = await response.json();
+    const vacancy = vacancies.find((item) => String(item.id) === String(params.id) && item.visibleStatus === 'Shown' && item.isDeleted === false);
     if (!vacancy) error(404);
 
     return {

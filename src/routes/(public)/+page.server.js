@@ -13,6 +13,8 @@ export async function load({ fetch }) {
 	const response = await fetch('/api/vacancies');
 	let vacancies = await response.json();
 
+	vacancies = vacancies.filter(vacancy => vacancy.visibleStatus === 'Shown' && vacancy.isDeleted === false);
+
 	return {
 		vacancies
 	};

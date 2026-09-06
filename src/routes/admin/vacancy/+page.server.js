@@ -1,11 +1,16 @@
-import data from '$lib/data/data.json';
+export async function load({ fetch }) {
+    const [resVacancies, resTotalViews] = await Promise.all([
+        fetch('/api/vacancies'),
+        fetch('/api/totalViews')
+    ]);
+    const resVacanciesData = await resVacancies.json();
+    const resTotalViewsData = await resTotalViews.json();
 
-export function load() {
     const viewMap = {};
-    data.totalView.forEach(tv => {
+    resTotalViewsData.forEach(tv => {
         viewMap[tv.vacId] = tv.count;
     });
-    const vacancies = data.vacancy.map(vac => {
+    const vacancies = resVacanciesData.map(vac => {
         return {
             ...vac,
             totalViews: viewMap[vac.id] || 0

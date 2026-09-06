@@ -1,8 +1,13 @@
-import data from '$lib/data/data.json';
+export async function load({ fetch }) {
+    const [resVacancies, resViews] = await Promise.all([
+        fetch('/api/vacancies'),
+        fetch('/api/views')
+    ]);
+    const vacancies = await resVacancies.json();
+    const views = await resViews.json();
 
-export function load() {
     // Cari tanggal terbaru untuk referensi "Hari Ini"
-    const dates = data.view.map(v => {
+    const dates = views.map(v => {
         const [d, m, y] = v.createdAt.split('-');
         return new Date(`${y}-${m}-${d}`).getTime();
     });
@@ -19,7 +24,7 @@ export function load() {
     const viewsPerVac = {};
 
     // Agregasi data views
-    data.view.forEach(v => {
+    views.forEach(v => {
         if (!viewsPerVac[v.vacId]) {
             viewsPerVac[v.vacId] = { today: 0, sevenDays: 0 };
         }
@@ -36,7 +41,7 @@ export function load() {
     });
 
     // Gabungkan (join) views dengan data vacancy, lalu filter isDeleted
-    const enrichedVacancies = data.vacancy
+    const enrichedVacancies = vacancies
         .filter(vac => !vac.isDeleted)
         .map(vac => {
             return {
