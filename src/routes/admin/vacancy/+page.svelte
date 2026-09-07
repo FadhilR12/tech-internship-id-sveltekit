@@ -14,7 +14,9 @@
 		Calendar,
 		Wifi,
 		Building2,
-		SearchX
+		SearchX,
+		X,
+		Save
 	} from '@lucide/svelte';
 	import { matches } from '$lib';
 	let { data } = $props();
@@ -46,6 +48,16 @@
 	let filteredVacancies = $derived(
 		data.vacancies.filter((vacancy) => matches(vacancy, debouncedSearch.value))
 	);
+
+	let vacancyModal;
+
+	function openVacancyModal() {
+		if (vacancyModal) vacancyModal.showModal();
+	}
+
+	function closeVacancyModal() {
+		if (vacancyModal) vacancyModal.close();
+	}
 </script>
 
 <header class="border-b border-slate-200 bg-white">
@@ -94,7 +106,7 @@
 		<!-- TODO(JS): Hubungkan pemicu ini ke dialog #vacancy-modal. -->
 		<button
 			type="button"
-			data-dialog-open="vacancy-modal"
+			onclick={openVacancyModal}
 			class="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-indigo-200 hover:bg-indigo-700"
 			><Plus class="h-4 w-4" aria-hidden="true"></Plus>Buat vacancy</button
 		>
@@ -207,3 +219,103 @@
 		</div>
 	</div>
 </main>
+<!-- TODO(JS): Pertahankan dialog ini; implementasikan showModal(), close(), submit, validasi, dan feedback penyimpanan. -->
+<dialog
+	id="vacancy-modal"
+	bind:this={vacancyModal}
+	class="m-auto w-[calc(100%-2rem)] max-w-3xl rounded-2xl p-0 backdrop:bg-slate-950/50"
+>
+	<div class="max-h-[90vh] overflow-y-auto">
+		<div
+			class="sticky top-0 z-10 flex items-center justify-between border-b border-slate-200 bg-white px-6 py-4"
+		>
+			<div class="flex items-center gap-3">
+				<span class="grid h-9 w-9 place-items-center rounded-xl bg-indigo-50 text-indigo-600"
+					><BriefcaseBusiness class="h-4 w-4" aria-hidden="true"></BriefcaseBusiness></span
+				>
+				<div>
+					<p class="text-xs font-bold text-indigo-600">Vacancy baru</p>
+					<h2 class="mt-0.5 text-xl font-extrabold">Buat vacancy</h2>
+				</div>
+			</div>
+			<button
+				type="button"
+				onclick={closeVacancyModal}
+				aria-label="Tutup modal"
+				class="rounded-lg p-2 text-slate-400 hover:bg-slate-100"
+				><X class="h-5 w-5" aria-hidden="true"></X></button
+			>
+		</div>
+		<form class="bg-white p-6" novalidate>
+			<div class="grid gap-5 sm:grid-cols-2">
+				<label class="sm:col-span-2"
+					><span class="mb-2 block text-sm font-bold">Title *</span><input
+						required
+						placeholder="Contoh: Frontend Engineer Intern"
+						class="focus-ring w-full rounded-xl border border-slate-200 px-4 py-3 text-sm"
+					/></label
+				>
+				<label
+					><span class="mb-2 block text-sm font-bold">Company *</span><input
+						required
+						placeholder="Nama perusahaan"
+						class="focus-ring w-full rounded-xl border border-slate-200 px-4 py-3 text-sm"
+					/></label
+				>
+				<label
+					><span class="mb-2 block text-sm font-bold">Location *</span><input
+						required
+						placeholder="Kota atau wilayah"
+						class="focus-ring w-full rounded-xl border border-slate-200 px-4 py-3 text-sm"
+					/></label
+				>
+				<label
+					><span class="mb-2 block text-sm font-bold">WorkType *</span><span class="relative block"
+						><select
+							required
+							class="custom-select focus-ring w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm"
+							><option value="">Pilih work type</option><option>Onsite</option><option
+								>Hybrid</option
+							><option>Remote</option></select
+						></span
+					></label
+				>
+				<label
+					><span class="mb-2 block text-sm font-bold">Status *</span><span class="relative block"
+						><select
+							required
+							class="custom-select focus-ring w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm"
+							><option>Hidden</option><option>Shown</option></select
+						></span
+					></label
+				>
+				<label class="sm:col-span-2"
+					><span class="mb-2 block text-sm font-bold">URL Lamaran *</span><input
+						type="url"
+						required
+						placeholder="https://..."
+						class="focus-ring w-full rounded-xl border border-slate-200 px-4 py-3 text-sm"
+					/></label
+				>
+				<div class="sm:col-span-2">
+					<label class="mb-2 block text-sm font-bold">Description *</label>
+					<div data-quill-editor aria-label="Description vacancy"></div>
+				</div>
+			</div>
+			<div class="mt-7 border-t border-slate-100 pt-5">
+				<div class="flex flex-col-reverse justify-end gap-2 sm:flex-row">
+					<button
+						type="button"
+						onclick={closeVacancyModal}
+						class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-slate-200 px-5 py-2.5 text-sm font-bold"
+						><X class="h-4 w-4" aria-hidden="true"></X>Batal</button
+					><button
+						type="button"
+						class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-indigo-600 px-6 py-2.5 text-sm font-bold text-white"
+						><Save class="h-4 w-4" aria-hidden="true"></Save>Simpan vacancy</button
+					>
+				</div>
+			</div>
+		</form>
+	</div>
+</dialog>

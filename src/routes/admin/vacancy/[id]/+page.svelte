@@ -17,13 +17,35 @@
 		Eye,
 		CalendarDays,
 		BarChart3,
-		EyeOff
+		EyeOff,
+		Archive,
+		X,
+		Save
 	} from '@lucide/svelte';
 	import { passedDays, sanitizeHtml } from '$lib';
 	let { data } = $props();
 	let safeDescription = $state('');
 
-	console.log(data.vacancy)
+	let editModal;
+	let deleteModal;
+
+	function openEditModal() {
+		if (editModal) editModal.showModal();
+	}
+
+	function closeEditModal() {
+		if (editModal) editModal.close();
+	}
+
+	function openDeleteModal() {
+		if (deleteModal) deleteModal.showModal();
+	}
+
+	function closeDeleteModal() {
+		if (deleteModal) deleteModal.close();
+	}
+
+	console.log(data.vacancy);
 	onMount(async () => {
 		safeDescription = await sanitizeHtml(data.vacancy.descHtml);
 	});
@@ -87,12 +109,12 @@
 				><ExternalLink class="h-4 w-4" aria-hidden="true"></ExternalLink>Lihat publik</a
 			><button
 				type="button"
-				data-dialog-open="vacancy-modal"
+				onclick={openEditModal}
 				class="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-3.5 py-2.5 text-xs font-bold text-white"
 				><Pencil class="h-4 w-4" aria-hidden="true"></Pencil>Edit</button
 			><button
 				type="button"
-				data-dialog-open="delete-dialog"
+				onclick={openDeleteModal}
 				class="inline-flex items-center gap-2 rounded-xl px-3.5 py-2.5 text-xs font-bold text-rose-600"
 				><Trash2 class="h-4 w-4" aria-hidden="true"></Trash2>Hapus</button
 			>
@@ -141,14 +163,12 @@
 				<Link class="h-3.5 w-3.5" aria-hidden="true"></Link>URL Lamaran
 			</p>
 			<a
-				href="{data.vacancy.applyUrl}"
+				href={data.vacancy.applyUrl}
 				target="_blank"
 				rel="noopener noreferrer"
 				class="mt-2 inline-flex items-center gap-2 text-sm font-bold break-all text-indigo-600 hover:underline"
-				>{data.vacancy.applyUrl} <ExternalLink
-					class="h-4 w-4 shrink-0"
-					aria-hidden="true"
-				></ExternalLink></a
+				>{data.vacancy.applyUrl}
+				<ExternalLink class="h-4 w-4 shrink-0" aria-hidden="true"></ExternalLink></a
 			>
 		</div>
 	</section>
@@ -215,3 +235,136 @@
 		</div>
 	</section>
 </main>
+
+<!-- TODO(JS): Pertahankan kedua dialog berikut; hubungkan tombol aksi ke showModal(), close(), dan operasi backend. -->
+<dialog
+	id="delete-dialog"
+	bind:this={deleteModal}
+	class="m-auto w-[calc(100%-2rem)] max-w-md rounded-2xl p-0 backdrop:bg-slate-950/50"
+>
+	<form class="p-6">
+		<span class="grid h-10 w-10 place-items-center rounded-xl bg-rose-50 text-rose-600"
+			><Archive class="h-5 w-5" aria-hidden="true"></Archive></span
+		>
+		<h2 class="mt-4 text-lg font-extrabold">Hapus vacancy?</h2>
+		<p class="mt-2 text-sm leading-6 text-slate-500">
+			Vacancy akan dipindahkan ke arsip. Informasi dan seluruh data views tetap tersimpan, tetapi
+			tidak dapat diubah lagi.
+		</p>
+		<div class="mt-6 flex justify-end gap-2">
+			<button
+				type="button"
+				onclick={closeDeleteModal}
+				class="rounded-xl border cursor-pointer border-slate-200 px-4 py-2.5 text-sm font-bold">Batal</button
+			><button
+				type="submit"
+				value="confirm"
+				class="inline-flex items-center cursor-pointer gap-2 rounded-xl bg-rose-600 px-4 py-2.5 text-sm font-bold text-white"
+				><Archive class="h-4 w-4" aria-hidden="true"></Archive>Hapus</button
+			>
+		</div>
+	</form>
+</dialog>
+
+<dialog
+	id="vacancy-modal"
+	bind:this={editModal}
+	class="m-auto w-[calc(100%-2rem)] max-w-3xl rounded-2xl p-0 backdrop:bg-slate-950/50"
+>
+	<div class="max-h-[90vh] overflow-y-auto">
+		<div
+			class="sticky top-0 z-10 flex items-center justify-between border-b border-slate-200 bg-white px-6 py-4"
+		>
+			<div class="flex items-center gap-3">
+				<span class="grid h-9 w-9 place-items-center rounded-xl bg-indigo-50 text-indigo-600"
+					><BriefcaseBusiness class="h-4 w-4" aria-hidden="true"></BriefcaseBusiness></span
+				>
+				<div>
+					<p class="text-xs font-bold text-indigo-600">Edit vacancy</p>
+					<h2 class="mt-0.5 text-xl font-extrabold">Perbarui vacancy</h2>
+				</div>
+			</div>
+			<button
+				type="button"
+				onclick={closeEditModal}
+				aria-label="Tutup modal"
+				class="rounded-lg p-2 text-slate-400 hover:bg-slate-100"
+				><X class="h-5 w-5" aria-hidden="true"></X></button
+			>
+		</div>
+		<form class="bg-white p-6" novalidate>
+			<div class="grid gap-5 sm:grid-cols-2">
+				<label class="sm:col-span-2"
+					><span class="mb-2 block text-sm font-bold">Title *</span><input
+						required
+						value="Frontend Engineer Intern"
+						class="focus-ring w-full rounded-xl border border-slate-200 px-4 py-3 text-sm"
+					/></label
+				>
+				<label
+					><span class="mb-2 block text-sm font-bold">Company *</span><input
+						required
+						value="Arunika Commerce"
+						class="focus-ring w-full rounded-xl border border-slate-200 px-4 py-3 text-sm"
+					/></label
+				>
+				<label
+					><span class="mb-2 block text-sm font-bold">Location *</span><input
+						required
+						value="Jakarta Selatan"
+						class="focus-ring w-full rounded-xl border border-slate-200 px-4 py-3 text-sm"
+					/></label
+				>
+				<label
+					><span class="mb-2 block text-sm font-bold">WorkType *</span><span class="relative block"
+						><select
+							class="custom-select focus-ring w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm"
+							><option>Onsite</option><option selected>Hybrid</option><option>Remote</option
+							></select
+						></span
+					></label
+				>
+				<label
+					><span class="mb-2 block text-sm font-bold">Status *</span><span class="relative block"
+						><select
+							class="custom-select focus-ring w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm"
+							><option>Hidden</option><option selected>Shown</option></select
+						></span
+					></label
+				>
+				<label class="sm:col-span-2"
+					><span class="mb-2 block text-sm font-bold">URL Lamaran *</span><input
+						type="url"
+						required
+						value="https://example.com/careers/frontend-intern"
+						class="focus-ring w-full rounded-xl border border-slate-200 px-4 py-3 text-sm"
+					/></label
+				>
+				<div class="sm:col-span-2">
+					<label class="mb-2 block text-sm font-bold">Description *</label>
+					<div data-quill-editor>
+						<h2>Tentang role ini</h2>
+						<p>
+							Arunika Commerce membantu brand lokal mengelola katalog, pesanan, dan promosi dari
+							satu dashboard.
+						</p>
+					</div>
+				</div>
+			</div>
+			<div class="mt-7 border-t border-slate-100 pt-5">
+				<div class="flex flex-col-reverse justify-end gap-2 sm:flex-row">
+					<button
+						type="button"
+						onclick={closeEditModal}
+						class="inline-flex items-center cursor-pointer justify-center gap-2 rounded-xl border border-slate-200 px-5 py-2.5 text-sm font-bold"
+						><X class="h-4 w-4" aria-hidden="true"></X>Batal</button
+					><button
+						type="button"
+						class="inline-flex items-center justify-center gap-2 rounded-xl cursor-pointer bg-indigo-600 px-6 py-2.5 text-sm font-bold text-white"
+						><Save class="h-4 w-4" aria-hidden="true"></Save>Simpan vacancy</button
+					>
+				</div>
+			</div>
+		</form>
+	</div>
+</dialog>
