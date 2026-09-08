@@ -1,5 +1,5 @@
 import { vacancies } from '$lib/data/vacancy.js';
-import { error } from '@sveltejs/kit';
+import { error, json } from '@sveltejs/kit';
 
 export async function DELETE({ params }) {
 	// cari id
@@ -18,7 +18,7 @@ export async function PUT({ params, request }) {
 	// ambil data dari form
 	const data = await request.formData();
 	const fields = Object.fromEntries(data.entries());
-    console.log(fields)
+	console.log(fields);
 	if (
 		fields.title === '' ||
 		fields.location === '' ||
@@ -40,4 +40,11 @@ export async function PUT({ params, request }) {
 	};
 
 	return new Response(null, { status: 204 });
+}
+
+export async function GET({ params }) {
+	const vac = vacancies.filter((v) => v.isDeleted !== true);
+	const vacancy = vac.find((vac) => vac.id === +params.id);
+
+	return json(vacancy || null);
 }

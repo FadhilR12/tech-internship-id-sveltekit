@@ -24,7 +24,6 @@
 	} from '@lucide/svelte';
 	import QuillEditor from '$lib/components/QuillEditor.svelte';
 	import { passedDays, sanitizeHtml } from '$lib';
-	import { vacancies } from '$lib/data/vacancy.js';
 	let { data } = $props();
 	let safeDescription = $state('');
 	

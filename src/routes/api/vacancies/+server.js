@@ -3,7 +3,8 @@ import { json } from '@sveltejs/kit';
 import { getCompanyInitialRegex } from '$lib';
 
 export function GET() {
-	return json(vacancies);
+	const vacs = vacancies.filter((v) => v.isDeleted !== true)
+	return json(vacs);
 }
 
 export async function POST({ request }) {
