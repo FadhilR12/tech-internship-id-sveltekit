@@ -99,7 +99,7 @@
 				href="/admin/vacancy"
 				class="flex items-center gap-2 rounded-lg bg-indigo-50 px-3 py-2 text-indigo-700"
 				><BriefcaseBusiness class="h-4 w-4" aria-hidden="true"></BriefcaseBusiness>Vacancy</a
-			><a href="login.html" class="flex items-center gap-2 rounded-lg px-3 py-2 text-rose-600"
+			><a href="/admin/login" class="flex items-center gap-2 rounded-lg px-3 py-2 text-rose-600"
 				><LogOut class="h-4 w-4" aria-hidden="true"></LogOut>Keluar</a
 			>
 		</div>

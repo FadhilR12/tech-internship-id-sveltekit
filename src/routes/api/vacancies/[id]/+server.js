@@ -43,8 +43,8 @@ export async function PUT({ params, request }) {
 }
 
 export async function GET({ params }) {
-	const vac = vacancies.filter((v) => v.isDeleted !== true);
-	const vacancy = vac.find((vac) => vac.id === +params.id);
+	const vacancy = vacancies.find((vac) => vac.id === +params.id);
+	if (vacancy.isDeleted) return null;
 
-	return json(vacancy || null);
+	return json(vacancy);
 }

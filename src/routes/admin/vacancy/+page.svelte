@@ -113,8 +113,8 @@
 				href="/"
 				class="hidden items-center gap-2 rounded-lg px-3 py-2 text-slate-500 hover:text-slate-900 sm:flex"
 				><ExternalLink class="h-4 w-4" aria-hidden="true"></ExternalLink>Website</a
-			><button class="flex items-center gap-2 rounded-lg px-3 py-2 text-rose-600"
-				><LogOut class="h-4 w-4" aria-hidden="true"></LogOut>Keluar</button
+			><a href="/admin/login" class="flex items-center gap-2 rounded-lg px-3 py-2 text-rose-600"
+				><LogOut class="h-4 w-4" aria-hidden="true"></LogOut>Keluar</a
 			>
 		</div>
 	</nav>

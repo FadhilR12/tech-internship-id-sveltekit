@@ -38,8 +38,8 @@
 				href="/"
 				class="hidden items-center gap-2 rounded-lg px-3 py-2 text-slate-500 hover:text-slate-900 sm:flex"
 				><ExternalLink class="h-4 w-4" aria-hidden="true"></ExternalLink>Website</a
-			><button class="flex items-center gap-2 rounded-lg px-3 py-2 text-rose-600"
-				><LogOut class="h-4 w-4" aria-hidden="true"></LogOut>Keluar</button
+			><a href="/admin/login" class="flex items-center gap-2 rounded-lg px-3 py-2 text-rose-600"
+				><LogOut class="h-4 w-4" aria-hidden="true"></LogOut>Keluar</a
 			>
 		</div>
 	</nav>
@@ -117,7 +117,10 @@
 						<tr
 							class="focus-visible:outline-inset cursor-pointer border-b border-slate-100 transition last:border-0 hover:bg-slate-50 focus-visible:bg-indigo-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-indigo-500"
 							><td class="px-5 py-4"
-								><a href="/admin/vacancy/{vacancy.id}" class="row-link" aria-label="Buka detail vacancy"
+								><a
+									href="/admin/vacancy/{vacancy.id}"
+									class="row-link"
+									aria-label="Buka detail vacancy"
 									><div class="flex items-center gap-3">
 										<span
 											class="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-indigo-50 text-xs font-extrabold text-indigo-700"
@@ -138,7 +141,8 @@
 								{:else}
 									<span
 										class="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-bold text-amber-700"
-										><EyeOff class="h-3 w-3" aria-hidden="true"></EyeOff>{vacancy.visibleStatus}</span
+										><EyeOff class="h-3 w-3" aria-hidden="true"
+										></EyeOff>{vacancy.visibleStatus}</span
 									>
 								{/if}
 							</td><td class="px-4 py-4 text-right text-sm font-semibold"
