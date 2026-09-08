@@ -4,7 +4,7 @@
 // 3. export const lalu pakai di server.js
 // 4. gunakan const ini sebagai api (api )
 
-import data from './data.json'
-export const vacancies = data.vacancy 
-export const views = data.view
-export const totalViews = data.totalView
+import data from './data.json';
+export const vacancies = [...data.vacancy];
+export const views = [...data.view];
+export const totalViews = [...data.totalView];

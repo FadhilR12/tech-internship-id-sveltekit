@@ -22,10 +22,12 @@
 		X,
 		Save
 	} from '@lucide/svelte';
+	import QuillEditor from '$lib/components/QuillEditor.svelte';
 	import { passedDays, sanitizeHtml } from '$lib';
+	import { vacancies } from '$lib/data/vacancy.js';
 	let { data } = $props();
 	let safeDescription = $state('');
-
+	
 	let editModal;
 	let deleteModal;
 
@@ -45,10 +47,40 @@
 		if (deleteModal) deleteModal.close();
 	}
 
-	console.log(data.vacancy);
 	onMount(async () => {
 		safeDescription = await sanitizeHtml(data.vacancy.descHtml);
 	});
+
+	async function updateVacancy(event) {
+		event.preventDefault();
+
+		const form = event.target;
+		const formData = new FormData(form);
+		formData.append('descHtml', data.vacancy.descHtml);
+
+		try {
+			const response = await fetch(`/api/vacancies/${data.vacancy.id}`, {
+				method: 'PUT',
+				body: formData
+			});
+
+			if (response.ok) {
+				closeEditModal();
+			} else {
+				alert('Gagal menyimpan vacancy');
+			}
+		} catch (error) {
+			console.error('Error:', error);
+			alert('Terjadi kesalahan sistem');
+		}
+	}
+
+	async function deleteVacancy(event) {
+		event.preventDefault();
+		const response = await fetch(`/api/vacancies/${data.vacancy.id}`, {
+			method: 'DELETE'
+		});
+	}
 </script>
 
 <header class="border-b border-slate-200 bg-white">
@@ -242,7 +274,7 @@
 	bind:this={deleteModal}
 	class="m-auto w-[calc(100%-2rem)] max-w-md rounded-2xl p-0 backdrop:bg-slate-950/50"
 >
-	<form class="p-6">
+	<form class="p-6" onsubmit={deleteVacancy}>
 		<span class="grid h-10 w-10 place-items-center rounded-xl bg-rose-50 text-rose-600"
 			><Archive class="h-5 w-5" aria-hidden="true"></Archive></span
 		>
@@ -255,11 +287,12 @@
 			<button
 				type="button"
 				onclick={closeDeleteModal}
-				class="rounded-xl border cursor-pointer border-slate-200 px-4 py-2.5 text-sm font-bold">Batal</button
+				class="cursor-pointer rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-bold"
+				>Batal</button
 			><button
 				type="submit"
 				value="confirm"
-				class="inline-flex items-center cursor-pointer gap-2 rounded-xl bg-rose-600 px-4 py-2.5 text-sm font-bold text-white"
+				class="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-rose-600 px-4 py-2.5 text-sm font-bold text-white"
 				><Archive class="h-4 w-4" aria-hidden="true"></Archive>Hapus</button
 			>
 		</div>
@@ -292,32 +325,36 @@
 				><X class="h-5 w-5" aria-hidden="true"></X></button
 			>
 		</div>
-		<form class="bg-white p-6" novalidate>
+		<form class="bg-white p-6" novalidate onsubmit={updateVacancy}>
 			<div class="grid gap-5 sm:grid-cols-2">
 				<label class="sm:col-span-2"
 					><span class="mb-2 block text-sm font-bold">Title *</span><input
 						required
-						value="Frontend Engineer Intern"
+						name="title"
+						value={data.vacancy.title}
 						class="focus-ring w-full rounded-xl border border-slate-200 px-4 py-3 text-sm"
 					/></label
 				>
 				<label
 					><span class="mb-2 block text-sm font-bold">Company *</span><input
 						required
-						value="Arunika Commerce"
+						name="company"
+						value={data.vacancy.company}
 						class="focus-ring w-full rounded-xl border border-slate-200 px-4 py-3 text-sm"
 					/></label
 				>
 				<label
 					><span class="mb-2 block text-sm font-bold">Location *</span><input
 						required
-						value="Jakarta Selatan"
+						name="location"
+						value={data.vacancy.location}
 						class="focus-ring w-full rounded-xl border border-slate-200 px-4 py-3 text-sm"
 					/></label
 				>
 				<label
 					><span class="mb-2 block text-sm font-bold">WorkType *</span><span class="relative block"
 						><select
+							name="workType"
 							class="custom-select focus-ring w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm"
 							><option>Onsite</option><option selected>Hybrid</option><option>Remote</option
 							></select
@@ -327,6 +364,7 @@
 				<label
 					><span class="mb-2 block text-sm font-bold">Status *</span><span class="relative block"
 						><select
+							name="visibleStatus"
 							class="custom-select focus-ring w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm"
 							><option>Hidden</option><option selected>Shown</option></select
 						></span
@@ -335,20 +373,15 @@
 				<label class="sm:col-span-2"
 					><span class="mb-2 block text-sm font-bold">URL Lamaran *</span><input
 						type="url"
+						name="url"
 						required
-						value="https://example.com/careers/frontend-intern"
+						value={data.vacancy.applyUrl}
 						class="focus-ring w-full rounded-xl border border-slate-200 px-4 py-3 text-sm"
 					/></label
 				>
 				<div class="sm:col-span-2">
 					<label class="mb-2 block text-sm font-bold">Description *</label>
-					<div data-quill-editor>
-						<h2>Tentang role ini</h2>
-						<p>
-							Arunika Commerce membantu brand lokal mengelola katalog, pesanan, dan promosi dari
-							satu dashboard.
-						</p>
-					</div>
+					<QuillEditor bind:content={safeDescription} />
 				</div>
 			</div>
 			<div class="mt-7 border-t border-slate-100 pt-5">
@@ -356,11 +389,11 @@
 					<button
 						type="button"
 						onclick={closeEditModal}
-						class="inline-flex items-center cursor-pointer justify-center gap-2 rounded-xl border border-slate-200 px-5 py-2.5 text-sm font-bold"
+						class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-slate-200 px-5 py-2.5 text-sm font-bold"
 						><X class="h-4 w-4" aria-hidden="true"></X>Batal</button
 					><button
-						type="button"
-						class="inline-flex items-center justify-center gap-2 rounded-xl cursor-pointer bg-indigo-600 px-6 py-2.5 text-sm font-bold text-white"
+						type="submit"
+						class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-indigo-600 px-6 py-2.5 text-sm font-bold text-white"
 						><Save class="h-4 w-4" aria-hidden="true"></Save>Simpan vacancy</button
 					>
 				</div>

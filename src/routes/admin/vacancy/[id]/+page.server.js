@@ -1,5 +1,7 @@
 import { error } from "@sveltejs/kit";
 
+// TODO: sediakan api untuk get vacancy sesuai dengan id
+
 export async function load({ fetch, params }) {
     const [resVacancies, resViews, resTotalViews] = await Promise.all([
         fetch('/api/vacancies'),

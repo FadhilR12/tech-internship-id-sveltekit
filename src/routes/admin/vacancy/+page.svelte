@@ -1,4 +1,5 @@
 <script>
+	import QuillEditor from '$lib/components/QuillEditor.svelte';
 	import {
 		GraduationCap,
 		ChartNoAxesColumnIncreasing,
@@ -20,6 +21,17 @@
 	} from '@lucide/svelte';
 	import { matches } from '$lib';
 	let { data } = $props();
+	let searchQuery = $state('');
+	let debouncedSearch = debounce('', 500);
+	let vacancyDescription = $state('');
+	let vacancyModal;
+	let filteredVacancies = $derived(
+		data.vacancies.filter((vacancy) => matches(vacancy, debouncedSearch.value))
+	);
+
+	$effect(() => {
+		debouncedSearch.value = searchQuery;
+	});
 
 	function debounce(val, delay = 300) {
 		let s = $state(val);
@@ -38,25 +50,42 @@
 		};
 	}
 
-	let searchQuery = $state('');
-	let debouncedSearch = debounce('', 500);
-
-	$effect(() => {
-		debouncedSearch.value = searchQuery;
-	});
-
-	let filteredVacancies = $derived(
-		data.vacancies.filter((vacancy) => matches(vacancy, debouncedSearch.value))
-	);
-
-	let vacancyModal;
-
 	function openVacancyModal() {
 		if (vacancyModal) vacancyModal.showModal();
 	}
 
 	function closeVacancyModal() {
-		if (vacancyModal) vacancyModal.close();
+		if (vacancyModal) {
+			vacancyModal.close();
+			const form = vacancyModal.querySelector('form');
+			if (form) form.reset();
+			vacancyDescription = '';
+		}
+	}
+
+	// PELAJARI INI
+	async function submitVacancy(event) {
+		event.preventDefault();
+
+		const form = event.target;
+		const formData = new FormData(form);
+		formData.append('descHtml', vacancyDescription);
+
+		try {
+			const response = await fetch('/api/vacancies', {
+				method: 'POST',
+				body: formData
+			});
+
+			if (response.ok) {
+				closeVacancyModal();
+			} else {
+				alert('Gagal menyimpan vacancy');
+			}
+		} catch (error) {
+			console.error('Error:', error);
+			alert('Terjadi kesalahan sistem');
+		}
 	}
 </script>
 
@@ -246,10 +275,12 @@
 				><X class="h-5 w-5" aria-hidden="true"></X></button
 			>
 		</div>
-		<form class="bg-white p-6" novalidate>
+		<form class="bg-white p-6" novalidate onsubmit={submitVacancy}>
 			<div class="grid gap-5 sm:grid-cols-2">
 				<label class="sm:col-span-2"
 					><span class="mb-2 block text-sm font-bold">Title *</span><input
+						type="text"
+						name="title"
 						required
 						placeholder="Contoh: Frontend Engineer Intern"
 						class="focus-ring w-full rounded-xl border border-slate-200 px-4 py-3 text-sm"
@@ -257,6 +288,8 @@
 				>
 				<label
 					><span class="mb-2 block text-sm font-bold">Company *</span><input
+						type="text"
+						name="company"
 						required
 						placeholder="Nama perusahaan"
 						class="focus-ring w-full rounded-xl border border-slate-200 px-4 py-3 text-sm"
@@ -264,6 +297,8 @@
 				>
 				<label
 					><span class="mb-2 block text-sm font-bold">Location *</span><input
+						type="text"
+						name="location"
 						required
 						placeholder="Kota atau wilayah"
 						class="focus-ring w-full rounded-xl border border-slate-200 px-4 py-3 text-sm"
@@ -272,6 +307,7 @@
 				<label
 					><span class="mb-2 block text-sm font-bold">WorkType *</span><span class="relative block"
 						><select
+							name="workType"
 							required
 							class="custom-select focus-ring w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm"
 							><option value="">Pilih work type</option><option>Onsite</option><option
@@ -283,6 +319,7 @@
 				<label
 					><span class="mb-2 block text-sm font-bold">Status *</span><span class="relative block"
 						><select
+							name="visibleStatus"
 							required
 							class="custom-select focus-ring w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm"
 							><option>Hidden</option><option>Shown</option></select
@@ -292,6 +329,7 @@
 				<label class="sm:col-span-2"
 					><span class="mb-2 block text-sm font-bold">URL Lamaran *</span><input
 						type="url"
+						name="url"
 						required
 						placeholder="https://..."
 						class="focus-ring w-full rounded-xl border border-slate-200 px-4 py-3 text-sm"
@@ -299,7 +337,7 @@
 				>
 				<div class="sm:col-span-2">
 					<label class="mb-2 block text-sm font-bold">Description *</label>
-					<div data-quill-editor aria-label="Description vacancy"></div>
+					<QuillEditor bind:content={vacancyDescription} />
 				</div>
 			</div>
 			<div class="mt-7 border-t border-slate-100 pt-5">
@@ -310,7 +348,7 @@
 						class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-slate-200 px-5 py-2.5 text-sm font-bold"
 						><X class="h-4 w-4" aria-hidden="true"></X>Batal</button
 					><button
-						type="button"
+						type="submit"
 						class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-indigo-600 px-6 py-2.5 text-sm font-bold text-white"
 						><Save class="h-4 w-4" aria-hidden="true"></Save>Simpan vacancy</button
 					>

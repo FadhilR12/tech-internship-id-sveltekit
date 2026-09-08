@@ -73,3 +73,8 @@ export function matches(vacancy, searchQuery) {
 		vacancy.location.toLowerCase().includes(query)
 	);
 }
+
+export function getCompanyInitialRegex(v) {
+  const matches = v.match(/[A-Z]/g) || [];
+  return matches.slice(0, 3).join('');
+}
