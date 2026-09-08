@@ -15,6 +15,7 @@
 	} from '@lucide/svelte';
 	import { passedDays, sanitizeHtml } from '$lib';
 	let { data } = $props();
+	let vacancy = $derived(data.vacancy);
 	let safeDescription = $state('');
 
 	onMount(async () => {
@@ -52,34 +53,34 @@
 				<div class="flex items-start gap-4">
 					<span
 						class="grid h-14 w-14 shrink-0 place-items-center rounded-xl bg-indigo-50 font-extrabold text-indigo-700 ring-1 ring-indigo-100"
-						>{data.vacancy.companyInitial}</span
+						>{vacancy.companyInitial}</span
 					>
 					<div>
 						<h1 class="text-2xl font-extrabold tracking-tight sm:text-3xl">
-							{data.vacancy.title}
+							{vacancy.title}
 						</h1>
-						<p class="mt-1 font-semibold text-slate-500">{data.vacancy.company}</p>
+						<p class="mt-1 font-semibold text-slate-500">{vacancy.company}</p>
 					</div>
 				</div>
 				<div
 					class="mt-6 flex flex-wrap gap-4 border-t border-slate-100 pt-5 text-sm font-semibold text-slate-500"
 				>
 					<span class="flex items-center gap-2"
-						><MapPin class="h-4 w-4 text-indigo-500" aria-hidden="true"></MapPin>{data.vacancy
-							.location}</span
+						><MapPin class="h-4 w-4 text-indigo-500" aria-hidden="true"
+						></MapPin>{vacancy.location}</span
 					><span class="flex items-center gap-2">
-						{#if data.vacancy.workType === 'Remote'}
+						{#if vacancy.workType === 'Remote'}
 							<Wifi class="h-4 w-4 text-indigo-500" aria-hidden="true" />
-						{:else if data.vacancy.workType === 'Hybrid'}
+						{:else if vacancy.workType === 'Hybrid'}
 							<Laptop class="h-4 w-4 text-indigo-500" aria-hidden="true" />
 						{:else}
 							<Building2 class="h-4 w-4 text-indigo-500" aria-hidden="true" />
 						{/if}
 
-						{data.vacancy.workType}
+						{vacancy.workType}
 					</span><span class="flex items-center gap-2"
 						><Clock3 class="h-4 w-4 text-indigo-500" aria-hidden="true"></Clock3>{passedDays(
-							data.vacancy.createdAt
+							vacancy.createdAt
 						)}</span
 					>
 				</div>
@@ -107,7 +108,7 @@
 					</div>
 				</div>
 				<a
-					href={data.vacancy.applicationUrl}
+					href={vacancy.applicationUrl}
 					target="_blank"
 					rel="noopener noreferrer"
 					class="focus-ring flex w-full shrink-0 items-center justify-center gap-2 rounded-xl bg-indigo-600 px-6 py-3 text-center text-sm font-bold text-white hover:bg-indigo-700 sm:w-auto"

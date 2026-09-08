@@ -18,7 +18,6 @@ export async function PUT({ params, request }) {
 	// ambil data dari form
 	const data = await request.formData();
 	const fields = Object.fromEntries(data.entries());
-	console.log(fields);
 	if (
 		fields.title === '' ||
 		fields.location === '' ||
@@ -42,6 +41,7 @@ export async function PUT({ params, request }) {
 	return new Response(null, { status: 204 });
 }
 
+// TODO UBAH MENJADI STANDARD API
 export async function GET({ params }) {
 	const vacancy = vacancies.find((vac) => vac.id === +params.id);
 	if (vacancy.isDeleted) return null;

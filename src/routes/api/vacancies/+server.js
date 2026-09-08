@@ -2,9 +2,43 @@ import { vacancies } from '$lib/data/vacancy.js';
 import { json } from '@sveltejs/kit';
 import { getCompanyInitialRegex } from '$lib';
 
-export function GET() {
-	const vacs = vacancies.filter((v) => v.isDeleted !== true)
-	return json(vacs);
+// API UNTUK SEMENTARA KEDEPANNYA PERLU DIBEDAKAN API LANDING PAGE DAN ADMIN
+export function GET({ url }) {
+	const statusQuery = url.searchParams.get('status');
+	const isDeletedQuery = url.searchParams.get('is_deleted');
+
+	let vacs = [];
+
+	vacs = vacancies.filter(v => {
+		let statusValid = true;
+		let isDeletedValid = true;
+
+		// Filter status
+		if (statusQuery !== '') {
+			// ?status=Shown or ?status=Hidden
+			if (statusQuery === 'Shown' || statusQuery === 'Hidden') {
+				statusValid = v.visibleStatus === statusQuery;
+			}
+		}
+
+		// Filter isDeleted
+		if (isDeletedQuery !== '') {
+			// ?is_deleted=true
+			if (isDeletedQuery === 'true') {
+				isDeletedValid = v.isDeleted;
+			} else {
+				isDeletedValid = !v.isDeleted;
+			}
+		}
+		
+		return statusValid && isDeletedValid;
+	});
+
+	return json({
+		statusCode: 200,
+		data: vacs,
+		message: 'get all vacancies success'
+	});
 }
 
 export async function POST({ request }) {

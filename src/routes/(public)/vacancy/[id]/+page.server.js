@@ -1,9 +1,10 @@
 import { error } from '@sveltejs/kit';
 
 export async function load({ fetch, params }) {
-    const response = await fetch('/api/vacancies');
-    const vacancies = await response.json();
-    const vacancy = vacancies.find((item) => String(item.id) === String(params.id) && item.visibleStatus === 'Shown' && item.isDeleted === false);
+    const id = params.id
+    const response = await fetch(`/api/vacancies/${id}`);
+    const vacancy = await response.json();
+    
     if (!vacancy) error(404);
 
     return {

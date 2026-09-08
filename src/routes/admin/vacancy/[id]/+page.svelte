@@ -25,8 +25,9 @@
 	import QuillEditor from '$lib/components/QuillEditor.svelte';
 	import { passedDays, sanitizeHtml } from '$lib';
 	let { data } = $props();
+	let vacancy = $derived(data.vacancy);
 	let safeDescription = $state('');
-	
+
 	let editModal;
 	let deleteModal;
 
@@ -47,7 +48,7 @@
 	}
 
 	onMount(async () => {
-		safeDescription = await sanitizeHtml(data.vacancy.descHtml);
+		safeDescription = await sanitizeHtml(vacancy.descHtml);
 	});
 
 	async function updateVacancy(event) {
@@ -55,15 +56,18 @@
 
 		const form = event.target;
 		const formData = new FormData(form);
-		formData.append('descHtml', data.vacancy.descHtml);
+		formData.append('descHtml', vacancy.descHtml);
 
 		try {
-			const response = await fetch(`/api/vacancies/${data.vacancy.id}`, {
+			const response = await fetch(`/api/vacancies/${vacancy.id}`, {
 				method: 'PUT',
 				body: formData
 			});
 
 			if (response.ok) {
+				const resp = await fetch(`/api/vacancies/${vacancy.id}`);
+				vacancy = await resp.json();
+				console.log(vacancy)
 				closeEditModal();
 			} else {
 				alert('Gagal menyimpan vacancy');
@@ -76,7 +80,7 @@
 
 	async function deleteVacancy(event) {
 		event.preventDefault();
-		const response = await fetch(`/api/vacancies/${data.vacancy.id}`, {
+		const response = await fetch(`/api/vacancies/${vacancy.id}`, {
 			method: 'DELETE'
 		});
 	}
@@ -116,24 +120,24 @@
 				><ArrowLeft class="h-4 w-4" aria-hidden="true"></ArrowLeft>Semua vacancy</a
 			>
 			<div class="mt-4 flex flex-wrap items-center gap-3">
-				<h1 class="text-3xl font-extrabold">{data.vacancy.title}</h1>
-				{#if data.vacancy.visibleStatus == 'Shown'}
+				<h1 class="text-3xl font-extrabold">{vacancy.title}</h1>
+				{#if vacancy.visibleStatus == 'Shown'}
 					<span
 						class="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700"
-						><Eye class="h-3 w-3" aria-hidden="true"></Eye>{data.vacancy.visibleStatus}</span
+						><Eye class="h-3 w-3" aria-hidden="true"></Eye>{vacancy.visibleStatus}</span
 					>
 				{:else}
 					<span
 						class="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-bold text-amber-700"
-						><EyeOff class="h-3 w-3" aria-hidden="true"></EyeOff>{data.vacancy.visibleStatus}</span
+						><EyeOff class="h-3 w-3" aria-hidden="true"></EyeOff>{vacancy.visibleStatus}</span
 					>
 				{/if}
 			</div>
-			<p class="mt-2 text-sm font-semibold text-slate-500">{data.vacancy.company}</p>
+			<p class="mt-2 text-sm font-semibold text-slate-500">{vacancy.company}</p>
 		</div>
 		<div class="flex flex-wrap gap-2">
 			<a
-				href="/vacancy/{data.vacancy.id}"
+				href="/vacancy/{vacancy.id}"
 				target="_blank"
 				rel="noopener noreferrer"
 				class="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs font-bold"
@@ -165,7 +169,7 @@
 				>
 					<MapPin class="h-3.5 w-3.5" aria-hidden="true"></MapPin>Location
 				</dt>
-				<dd class="mt-1 text-sm font-bold">{data.vacancy.location}</dd>
+				<dd class="mt-1 text-sm font-bold">{vacancy.location}</dd>
 			</div>
 			<div>
 				<dt
@@ -173,7 +177,7 @@
 				>
 					<Laptop class="h-3.5 w-3.5" aria-hidden="true"></Laptop>WorkType
 				</dt>
-				<dd class="mt-1 text-sm font-bold">{data.vacancy.workType}</dd>
+				<dd class="mt-1 text-sm font-bold">{vacancy.workType}</dd>
 			</div>
 			<div>
 				<dt
@@ -194,11 +198,11 @@
 				<Link class="h-3.5 w-3.5" aria-hidden="true"></Link>URL Lamaran
 			</p>
 			<a
-				href={data.vacancy.applyUrl}
+				href={vacancy.applyUrl}
 				target="_blank"
 				rel="noopener noreferrer"
 				class="mt-2 inline-flex items-center gap-2 text-sm font-bold break-all text-indigo-600 hover:underline"
-				>{data.vacancy.applyUrl}
+				>{vacancy.applyUrl}
 				<ExternalLink class="h-4 w-4 shrink-0" aria-hidden="true"></ExternalLink></a
 			>
 		</div>
@@ -330,7 +334,7 @@
 					><span class="mb-2 block text-sm font-bold">Title *</span><input
 						required
 						name="title"
-						value={data.vacancy.title}
+						value={vacancy.title}
 						class="focus-ring w-full rounded-xl border border-slate-200 px-4 py-3 text-sm"
 					/></label
 				>
@@ -338,7 +342,7 @@
 					><span class="mb-2 block text-sm font-bold">Company *</span><input
 						required
 						name="company"
-						value={data.vacancy.company}
+						value={vacancy.company}
 						class="focus-ring w-full rounded-xl border border-slate-200 px-4 py-3 text-sm"
 					/></label
 				>
@@ -346,7 +350,7 @@
 					><span class="mb-2 block text-sm font-bold">Location *</span><input
 						required
 						name="location"
-						value={data.vacancy.location}
+						value={vacancy.location}
 						class="focus-ring w-full rounded-xl border border-slate-200 px-4 py-3 text-sm"
 					/></label
 				>
@@ -374,7 +378,7 @@
 						type="url"
 						name="url"
 						required
-						value={data.vacancy.applyUrl}
+						value={vacancy.applyUrl}
 						class="focus-ring w-full rounded-xl border border-slate-200 px-4 py-3 text-sm"
 					/></label
 				>
