@@ -1,24 +1,36 @@
 <script>
 	import { LockKeyhole, LogIn, Mail, ShieldCheck } from '@lucide/svelte';
+	import * as z from 'zod';
 	import { goto } from '$app/navigation';
-	let missing = $state(false);
-	let incorect = $state(false);
+	let errorMessage = $state('');
+
+	const User = z.object({
+		email: z.string().nonempty('Pastikan semua field terisi').email('Format email salah'),
+		pass: z.string().nonempty('Pastikan semua field terisi')
+	});
+
 	async function submitEvent(event) {
 		event.preventDefault();
 		const formData = new FormData(event.target);
 		const email = formData.get('email');
 		const pass = formData.get('password');
-		// TODO lakukan validasi untuk email agar valid
-		if (!email || !pass) {
-			missing = true;
-			incorect = false;
-		} else if (email !== 'admin@techinternship.id' && pass !== 'admin123') {
-			incorect = true;
-			missing = false;
-		} else {
-			missing = false;
-			incorect = false;
-			goto('/admin');
+
+		try {
+			await User.parseAsync({
+				email: email,
+				pass: pass
+			});
+			if (email === 'admin@techinternship.id' && pass === 'admin123') goto('/admin');
+			throw new Error('Email atau password salah');
+		} catch (error) {
+			if (error instanceof z.ZodError) {
+				if (error.issues.length > 0) {
+					errorMessage = error.issues[0].message;
+				}
+			} else {
+				console.log(error);
+				errorMessage = error.message;
+			}
 		}
 	}
 </script>
@@ -35,12 +47,17 @@
 		<p class="mt-2 text-sm text-slate-500">Kelola vacancy dan lihat analytics views.</p>
 		<!-- TODO(JS): Kirim kredensial ke handler autentikasi, tampilkan error login, dan aktifkan toggle visibilitas password. -->
 		<form id="login-form" class="mt-6 space-y-4" novalidate onsubmit={submitEvent}>
-			{#if missing}<span class="flex text-[10px] font-bold text-red-700"
-					>Pastikan semua field terisi</span
+			<!-- {#if missing}<span class="flex text-[10px] font-bold text-red-700"
+					>Pastikan semua field terisiz</span
 				>
 			{/if}
 			{#if incorect}<span class="flex text-[10px] font-bold text-red-700"
 					>Pastikan memasukan email atau password yang benar</span
+				>
+			{/if} -->
+			{#if errorMessage !== ''}
+				<span class="flex rounded-[8px] bg-red-300/60 p-3 text-[12px] font-semibold text-red-700"
+					>{errorMessage}</span
 				>
 			{/if}
 			<label class="block"
