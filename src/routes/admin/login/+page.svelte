@@ -28,7 +28,6 @@
 					errorMessage = error.issues[0].message;
 				}
 			} else {
-				console.log(error);
 				errorMessage = error.message;
 			}
 		}

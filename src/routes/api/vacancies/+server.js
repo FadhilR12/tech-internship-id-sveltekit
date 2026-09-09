@@ -74,7 +74,5 @@ export async function POST({ request }) {
 	};
 
 	vacancies.push(newVacancy);
-
-	console.log(newVacancy);
 	return json({ success: true });
 }

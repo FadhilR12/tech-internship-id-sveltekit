@@ -20,6 +20,8 @@
 		Save
 	} from '@lucide/svelte';
 	import { matches } from '$lib';
+	import * as z from 'zod';
+	import { invalidateAll } from '$app/navigation';
 	let { data } = $props();
 	let searchQuery = $state('');
 	let debouncedSearch = debounce('', 500);
@@ -28,6 +30,19 @@
 	let filteredVacancies = $derived(
 		data.vacancies.filter((vacancy) => matches(vacancy, debouncedSearch.value))
 	);
+	let type = ['Onsite', 'Hybrid', 'Remote'];
+	let errorMessage = $state('');
+	const vacData = z.object({
+		title: z.string().nonempty('Pastikan semua field terisi'),
+		company: z.string().nonempty('Pastikan semua field terisi'),
+		location: z.string().nonempty('Pastikan semua field terisi'),
+		workType: z.enum(type, 'Pastikan memilih pilihan yang valid'),
+		url: z
+			.string()
+			.nonempty('Pastikan semua field terisi')
+			.url('Pastikan memasukan url yang valid'),
+		descHtml: z.string().nonempty('Pastikan semua field terisi')
+	});
 
 	$effect(() => {
 		debouncedSearch.value = searchQuery;
@@ -60,32 +75,63 @@
 			const form = vacancyModal.querySelector('form');
 			if (form) form.reset();
 			vacancyDescription = '';
+			errorMessage = '';
 		}
 	}
 
 	// PELAJARI INI
 	async function submitVacancy(event) {
 		event.preventDefault();
-
-		const form = event.target;
-		const formData = new FormData(form);
+		const formData = new FormData(event.target);
 		formData.append('descHtml', vacancyDescription);
 
 		try {
+			await vacData.parseAsync({
+				title: formData.get('title'),
+				company: formData.get('company'),
+				location: formData.get('location'),
+				workType: formData.get('workType'),
+				url: formData.get('url'),
+				descHtml: formData.get('descHtml')
+			});
+
 			const response = await fetch('/api/vacancies', {
 				method: 'POST',
 				body: formData
 			});
 
 			if (response.ok) {
+				await invalidateAll();
 				closeVacancyModal();
 			} else {
-				alert('Gagal menyimpan vacancy');
+				throw new Error('Gagal menambahkan vacancy');
 			}
 		} catch (error) {
-			console.error('Error:', error);
-			alert('Terjadi kesalahan sistem');
+			if (error instanceof z.ZodError) {
+				if (error.issues.length > 0) {
+					errorMessage = error.issues[0].message;
+				}
+			} else {
+				console.error('Error:', error);
+				alert('Terjadi kesalahan sistem');
+			}
 		}
+
+		// try {
+		// 	const response = await fetch('/api/vacancies', {
+		// 		method: 'POST',
+		// 		body: formData
+		// 	});
+
+		// 	if (response.ok) {
+		// 		closeVacancyModal();
+		// 	} else {
+		// 		alert('Gagal menyimpan vacancy');
+		// 	}
+		// } catch (error) {
+		// 	console.error('Error:', error);
+		// 	alert('Terjadi kesalahan sistem');
+		// }
 	}
 </script>
 
@@ -276,6 +322,12 @@
 			>
 		</div>
 		<form class="bg-white p-6" novalidate onsubmit={submitVacancy}>
+			{#if errorMessage !== ''}
+				<span
+					class="mb-5 flex rounded-[8px] bg-red-300/60 p-3 text-[12px] font-semibold text-red-700"
+					>{errorMessage}</span
+				>
+			{/if}
 			<div class="grid gap-5 sm:grid-cols-2">
 				<label class="sm:col-span-2"
 					><span class="mb-2 block text-sm font-bold">Title *</span><input

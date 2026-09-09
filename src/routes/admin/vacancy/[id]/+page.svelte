@@ -53,9 +53,7 @@
 
 	async function updateVacancy(event) {
 		event.preventDefault();
-
-		const form = event.target;
-		const formData = new FormData(form);
+		const formData = new FormData(event.target);
 		formData.append('descHtml', vacancy.descHtml);
 
 		try {
@@ -67,7 +65,7 @@
 			if (response.ok) {
 				const resp = await fetch(`/api/vacancies/${vacancy.id}`);
 				vacancy = await resp.json();
-				console.log(vacancy)
+				console.log(vacancy);
 				closeEditModal();
 			} else {
 				alert('Gagal menyimpan vacancy');
