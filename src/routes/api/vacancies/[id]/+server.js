@@ -44,7 +44,9 @@ export async function PUT({ params, request }) {
 // TODO UBAH MENJADI STANDARD API
 export async function GET({ params }) {
 	const vacancy = vacancies.find((vac) => vac.id === +params.id);
-	if (vacancy.isDeleted) return null;
+	if (!vacancy || vacancy.isDeleted) {
+		throw error(404, 'Vacancy tidak ditemukan atau sudah dihapus');
+	}
 
 	return json(vacancy);
 }

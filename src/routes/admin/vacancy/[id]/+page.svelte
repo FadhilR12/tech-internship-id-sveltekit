@@ -24,6 +24,7 @@
 	} from '@lucide/svelte';
 	import QuillEditor from '$lib/components/QuillEditor.svelte';
 	import { passedDays, sanitizeHtml } from '$lib';
+	import { goto } from '$app/navigation';
 	let { data } = $props();
 	let vacancy = $derived(data.vacancy);
 	let safeDescription = $state('');
@@ -78,9 +79,17 @@
 
 	async function deleteVacancy(event) {
 		event.preventDefault();
+
 		const response = await fetch(`/api/vacancies/${vacancy.id}`, {
 			method: 'DELETE'
 		});
+
+		if (response.ok) {
+			goto('/admin/vacancy');
+		} else {
+			console.error('Error:', error);
+			alert('Gagal menghapus vacancy')
+		}
 	}
 </script>
 
