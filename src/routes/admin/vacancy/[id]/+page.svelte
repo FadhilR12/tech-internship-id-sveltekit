@@ -152,12 +152,12 @@
 			><button
 				type="button"
 				onclick={openEditModal}
-				class="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-3.5 py-2.5 text-xs font-bold text-white"
+				class="inline-flex items-center cursor-pointer gap-2 rounded-xl bg-indigo-600 px-3.5 py-2.5 text-xs font-bold text-white"
 				><Pencil class="h-4 w-4" aria-hidden="true"></Pencil>Edit</button
 			><button
 				type="button"
 				onclick={openDeleteModal}
-				class="inline-flex items-center gap-2 rounded-xl px-3.5 py-2.5 text-xs font-bold text-rose-600"
+				class="inline-flex items-center gap-2 rounded-xl cursor-pointer px-3.5 py-2.5 text-xs font-bold text-rose-600"
 				><Trash2 class="h-4 w-4" aria-hidden="true"></Trash2>Hapus</button
 			>
 		</div>
