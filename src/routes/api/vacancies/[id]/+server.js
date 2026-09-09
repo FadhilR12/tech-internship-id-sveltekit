@@ -18,17 +18,6 @@ export async function PUT({ params, request }) {
 	// ambil data dari form
 	const data = await request.formData();
 	const fields = Object.fromEntries(data.entries());
-	if (
-		fields.title === '' ||
-		fields.location === '' ||
-		fields.workType === '' ||
-		fields.url === '' ||
-		fields.location === '' ||
-		fields.descHtml === ''
-	) {
-		new Response(null, { status: 404 });
-	}
-
 	// cari id
 	const vacancyIndex = vacancies.findIndex((vac) => vac.id === +params.id);
 	if (vacancyIndex === -1) error(404);

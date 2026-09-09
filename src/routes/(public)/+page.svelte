@@ -81,7 +81,7 @@
 	</nav>
 </header>
 
-<main>
+<main class="flex-1">
 	<section class="hero-grid overflow-hidden border-b border-slate-200 px-5 py-14 sm:py-20">
 		<div class="mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-[1.05fr_.95fr]">
 			<div>

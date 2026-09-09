@@ -25,19 +25,35 @@
 	import QuillEditor from '$lib/components/QuillEditor.svelte';
 	import { passedDays, sanitizeHtml } from '$lib';
 	import { goto } from '$app/navigation';
+	import * as z from 'zod';
 	let { data } = $props();
 	let vacancy = $derived(data.vacancy);
 	let safeDescription = $state('');
-
 	let editModal;
 	let deleteModal;
+	let type = ['Onsite', 'Hybrid', 'Remote'];
+	let errorMessage = $state('');
+	const vacData = z.object({
+		title: z.string().nonempty('Pastikan semua field terisi'),
+		company: z.string().nonempty('Pastikan semua field terisi'),
+		location: z.string().nonempty('Pastikan semua field terisi'),
+		workType: z.enum(type, 'Pastikan memilih pilihan yang valid'),
+		url: z
+			.string()
+			.nonempty('Pastikan semua field terisi')
+			.url('Pastikan memasukan url yang valid'),
+		descHtml: z.string().nonempty('Pastikan semua field terisi')
+	});
 
 	function openEditModal() {
 		if (editModal) editModal.showModal();
 	}
 
 	function closeEditModal() {
-		if (editModal) editModal.close();
+		if (editModal) {
+			editModal.close();
+			errorMessage = '';
+		}
 	}
 
 	function openDeleteModal() {
@@ -55,9 +71,18 @@
 	async function updateVacancy(event) {
 		event.preventDefault();
 		const formData = new FormData(event.target);
-		formData.append('descHtml', vacancy.descHtml);
+		formData.append('descHtml', safeDescription);
 
 		try {
+			await vacData.parseAsync({
+				title: formData.get('title'),
+				company: formData.get('company'),
+				location: formData.get('location'),
+				workType: formData.get('workType'),
+				url: formData.get('applyUrl'),
+				descHtml: formData.get('descHtml')
+			});
+
 			const response = await fetch(`/api/vacancies/${vacancy.id}`, {
 				method: 'PUT',
 				body: formData
@@ -72,9 +97,34 @@
 				alert('Gagal menyimpan vacancy');
 			}
 		} catch (error) {
-			console.error('Error:', error);
-			alert('Terjadi kesalahan sistem');
+			if (error instanceof z.ZodError) {
+				if (error.issues.length > 0) {
+					errorMessage = error.issues[0].message;
+				}
+			} else {
+				console.error('Error:', error);
+				alert('Terjadi kesalahan sistem');
+			}
 		}
+
+		// try {
+		// 	const response = await fetch(`/api/vacancies/${vacancy.id}`, {
+		// 		method: 'PUT',
+		// 		body: formData
+		// 	});
+
+		// 	if (response.ok) {
+		// 		const resp = await fetch(`/api/vacancies/${vacancy.id}`);
+		// 		vacancy = await resp.json();
+		// 		console.log(vacancy);
+		// 		closeEditModal();
+		// 	} else {
+		// 		alert('Gagal menyimpan vacancy');
+		// 	}
+		// } catch (error) {
+		// 	console.error('Error:', error);
+		// 	alert('Terjadi kesalahan sistem');
+		// }
 	}
 
 	async function deleteVacancy(event) {
@@ -88,7 +138,7 @@
 			goto('/admin/vacancy');
 		} else {
 			console.error('Error:', error);
-			alert('Gagal menghapus vacancy')
+			alert('Gagal menghapus vacancy');
 		}
 	}
 </script>
@@ -152,12 +202,12 @@
 			><button
 				type="button"
 				onclick={openEditModal}
-				class="inline-flex items-center cursor-pointer gap-2 rounded-xl bg-indigo-600 px-3.5 py-2.5 text-xs font-bold text-white"
+				class="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-indigo-600 px-3.5 py-2.5 text-xs font-bold text-white"
 				><Pencil class="h-4 w-4" aria-hidden="true"></Pencil>Edit</button
 			><button
 				type="button"
 				onclick={openDeleteModal}
-				class="inline-flex items-center gap-2 rounded-xl cursor-pointer px-3.5 py-2.5 text-xs font-bold text-rose-600"
+				class="inline-flex cursor-pointer items-center gap-2 rounded-xl px-3.5 py-2.5 text-xs font-bold text-rose-600"
 				><Trash2 class="h-4 w-4" aria-hidden="true"></Trash2>Hapus</button
 			>
 		</div>
@@ -336,6 +386,12 @@
 			>
 		</div>
 		<form class="bg-white p-6" novalidate onsubmit={updateVacancy}>
+			{#if errorMessage !== ''}
+				<span
+					class="mb-5 flex rounded-[8px] bg-red-300/60 p-3 text-[12px] font-semibold text-red-700"
+					>{errorMessage}</span
+				>
+			{/if}
 			<div class="grid gap-5 sm:grid-cols-2">
 				<label class="sm:col-span-2"
 					><span class="mb-2 block text-sm font-bold">Title *</span><input
@@ -383,7 +439,7 @@
 				<label class="sm:col-span-2"
 					><span class="mb-2 block text-sm font-bold">URL Lamaran *</span><input
 						type="url"
-						name="url"
+						name="applyUrl"
 						required
 						value={vacancy.applyUrl}
 						class="focus-ring w-full rounded-xl border border-slate-200 px-4 py-3 text-sm"
